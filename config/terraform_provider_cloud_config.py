@@ -14,8 +14,8 @@ null_cloud = Cloud("", "", "", "")
 
 clouds = {
     "telefonicaopencloud": Cloud("TelefonicaOpenCloud", "telefonica open cloud", _normalize_dir("github.com/huawei-clouds/terraform-provider-telefonicaopencloud"), ""),
-    "huaweicloud":         Cloud("HuaweiCloud",         "huawei cloud",          _normalize_dir("github.com/huawei-clouds/terraform-provider-huaweicloud"), _normalize_dir("github.com/huawei-clouds/golangsdk")),
-    "opentelekomcloud":    Cloud("OpenTelekomCloud",    "open telekom cloud",    _normalize_dir("github.com/gator1/terraform-provider-opentelekomcloud"), ""),
+    "huaweicloud":         Cloud("HuaweiCloud",         "huawei cloud",          _normalize_dir("github.com/huawei-clouds/terraform-provider-huaweicloud"), _normalize_dir("github.com/huaweicloud/golangsdk")),
+    "opentelekomcloud":    Cloud("OpenTelekomCloud",    "open telekom cloud",    _normalize_dir("github.com/huaweicloud/terraform-provider-opentelekomcloud"), ""),
     "flexibleengine":      Cloud("FlexibleEngine",      "flexible engine",       _normalize_dir("github.com/Karajan-project/terraform-provider-flexibleengine"), ""),
 }
 
