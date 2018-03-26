@@ -20,7 +20,7 @@ clouds = {
     "telefonicaopencloud": Cloud("telefonicaopencloud", "TelefonicaOpenCloud", "telefonica open cloud", "",           _normalize_dir("github.com/huaweicloud/terraform-provider-telefonicaopencloud")),
     "huaweicloud":         Cloud("huaweicloud",         "HuaweiCloud",         "huawei cloud",          "golangsdk",  _normalize_dir("github.com/huaweicloud/terraform-provider-huaweicloud")),
     "opentelekomcloud":    Cloud("opentelekomcloud" ,   "OpenTelekomCloud",    "open telekom cloud",    "",           _normalize_dir("github.com/terraform-providers/terraform-provider-opentelekomcloud")),
-    "flexibleengine":      Cloud("flexibleengine",      "FlexibleEngine",      "flexible engine",       "",           _normalize_dir("github.com/Karajan-project/terraform-provider-flexibleengine")),
+    "flexibleengine":      Cloud("flexibleengine",      "FlexibleEngine",      "flexible engine",       "",           _normalize_dir("github.com/huaweicloud/terraform-provider-flexibleengine")),
 }
 
 
