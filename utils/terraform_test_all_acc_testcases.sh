@@ -82,13 +82,13 @@ is_need_test() {
 run_tests() {
     for i in ${need_test[@]}
     do
+        $isstop && break
+
         echo $i
         if [ "$(is_need_test $i)" = "no" ]; then
             echo -e "  no need test ### $i \n\n";
             continue
         fi
-
-	test $isstop && break
 
         terraform_test_one_acc_testcase.sh $i $dest_cloud
 
