@@ -80,6 +80,8 @@ is_need_test() {
 }
 
 run_tests() {
+    local r=""
+    local err=""
     for i in ${need_test[@]}
     do
         $isstop && break
@@ -90,8 +92,11 @@ run_tests() {
             continue
         fi
 
-        terraform_test_one_acc_testcase.sh $i $dest_cloud
+	r=$(terraform_test_one_acc_testcase.sh $i $dest_cloud)
+	err=$(echo $r | grep "^--- FAIL: $i")
+	test -n "$err" && mv $TF_LOG_PATH "${TF_LOG_PATH}_$i"
 
+	echo $r
         echo -e "\n\n"
     done
 }
