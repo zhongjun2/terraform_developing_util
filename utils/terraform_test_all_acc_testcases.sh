@@ -16,6 +16,9 @@ if [ $# -lt 3 ]; then
     exit 1
 fi
 
+isstop=false
+trap "isstop=true; echo stop" 1 2 3 15 #stop if receives a signal
+
 test_files=$3
 dest_cloud_alias=$4
 if [ -n "$test_files" ] && [ -z "$(echo $test_files | grep _test.go)" ]; then
@@ -84,6 +87,8 @@ run_tests() {
             echo -e "  no need test ### $i \n\n";
             continue
         fi
+
+	test $isstop && break
 
         terraform_test_one_acc_testcase.sh $i $dest_cloud
 

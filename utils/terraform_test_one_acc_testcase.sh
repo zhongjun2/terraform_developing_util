@@ -25,5 +25,5 @@ dest_dir=$($get_config code_dir $dest_cloud_alias)
 cd $dest_dir
 echo "run $dest_dir: $1"
 rm $TF_LOG_PATH
-make testacc TEST=./$dest_cloud/ TESTARGS="-run=$1"
+TF_ACC=1 go test ./$dest_cloud/ -v -run=$1 -timeout 30m
 cd $cur_dir
