@@ -3,15 +3,16 @@
 if [ $# -lt 3 ]; then
     echo -e "this util is used to test all acc testcase in a provider or specified test files\n"
     echo "usage: $0"
-    echo "  rest_result_dir(record the out put of go test)"
     echo "  action:"
     echo "    filter: show the result of test"
     echo "    test: test all acc tests again"
     echo "    test_new: test all tests which haven't been tested"
     echo "    test_not_success: test all tests which are failed or haven't been tested"
     echo "  test_files:"
-    echo "    if it test all test cases in the code repository, input \"\""
-    echo "    otherwise specify the test files in the format: \"file1 file2 ..\""
+    echo "    if it test all test cases in the code repository, input: *"
+    echo "    or use wildcard * to sepcify a batch of files: resource_huaweicloud_elb*"
+    echo "    or specify the test files explicitly in the format: \"file1 file2 ..\""
+    echo "  rest_result_dir(record the out put of go test)"
     echo "  [cloud name alias]"
     exit 1
 fi
@@ -19,11 +20,7 @@ fi
 isstop=false
 trap "isstop=true; echo stop" 1 2 3 15 #stop if receives a signal
 
-test_files=$3
 dest_cloud_alias=$4
-if [ -n "$test_files" ] && [ -z "$(echo $test_files | grep _test.go)" ]; then
-    echo "invalid test files" && exit 1
-fi
 
 common_funcs="$(dirname $(which $0))/common.sh"
 . $common_funcs
@@ -41,11 +38,13 @@ fi
 
 source_dir="$($get_config code_dir $dest_cloud_alias)/$dest_cloud"
 
+test_files=$2
 test -z "$test_files" && test_files="${source_dir}/*.go"
 need_test=$(egrep "\(t \*testing.T\) {" $test_files | awk -F 'func' '{print $2}' | awk -F '(' '{print $1}' | sort)
+test -z "$need_test" && echo "no testcase to run" && exit 1
 
-result=$(get_file_absolute_path $1)
-action=$2
+action=$1
+result=$(get_file_absolute_path $3)
 
 filter_a_acc_test() {
     local files="${result}*"
