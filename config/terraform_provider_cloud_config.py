@@ -25,6 +25,10 @@ clouds = {
 
 
 def _get_cloud(cloud_alias):
+    c = clouds.get(cloud_alias)
+    if c:
+        return c
+
     p = re.compile("^%s" % cloud_alias)
     for k, c in clouds.items():
         m = p.match(k)
