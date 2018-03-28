@@ -92,10 +92,10 @@ run_tests() {
         fi
 
 	r=$(terraform_test_one_acc_testcase.sh $i $dest_cloud)
-	err=$(echo $r | grep "^--- FAIL: $i")
+	err=$(echo $r | grep " FAIL: $i")
 	test -n "$err" && mv $TF_LOG_PATH "${TF_LOG_PATH}_$i"
 
-	echo $r
+	echo -e "$r"
         echo -e "\n\n"
     done
 }
