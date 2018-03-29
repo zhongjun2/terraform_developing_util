@@ -7,7 +7,7 @@ if [ $# -lt 6 ]; then
 	echo "      api_doc_dir"
 	echo "      resource_name:child_resource_name(all the two names' first character should be capital)"
 	echo "      resource_go_file_name"
-	echo "      resource version[v1 | v2]"
+	echo "      resource version[v1 | v2 | \"\"]"
 	echo "      how to do with the old go file[rm | new], default is new"
 	exit 1
 fi
@@ -67,7 +67,8 @@ echo $resource_version
 #                  generatte resource codes                    #
 # ------------------------------------------------------------ #
 
-name="${resource_name}-${child_resource_name}"
+name=$child_resource_name
+test -n "${resource_name}" && name="${resource_name}-${child_resource_name}"
 method_prefix=resource${resource_name}${child_resource_name}${resource_version}
 
 # generate schema

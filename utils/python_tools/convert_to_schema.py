@@ -171,9 +171,10 @@ class ConvertToSchema(object):
             req_struct = req_structs[req_struct_name]
             for item in req_struct:
                 name, required = self._parse_req_opt_tag(item.tag)
-                if name not in resp_struct_map:
-                    raise Exception("req struct:%s opt:%s not in resp struct:%s" % (
-                        req_struct_name, name, resp_struct_name))
+                # this scenario may be exist
+                #if name not in resp_struct_map:
+                #    raise Exception("req struct:%s opt:%s not in resp struct:%s" % (
+                #        req_struct_name, name, resp_struct_name))
 
                 parsed_params.add(name)
 
