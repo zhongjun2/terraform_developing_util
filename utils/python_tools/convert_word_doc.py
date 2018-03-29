@@ -80,7 +80,11 @@ class WordDocPretreatment(object):
         names = [i.param.lower() for i in rows]
         s = set(names)
         if len(s) != len(names):
-            raise Exception("Not All lowercase parameter names are different")
+            m = {i:0 for i in s}
+            for i in names:
+                m[i] += 1
+            ns = [k for k, v in m.items() if v > 1]
+            raise Exception("Not All lowercase parameter names are different: %s" % " ".join(ns))
 
     @classmethod
     def _parse_param_type(cls, type_str):
