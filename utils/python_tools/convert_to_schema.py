@@ -164,7 +164,7 @@ class ConvertToSchema(object):
         def _merge_struct(req_struct_name, resp_struct_name):
             result = []
 
-            resp_struct = resp_structs[resp_struct_name]
+            resp_struct = resp_structs.get(resp_struct_name, [])
             resp_struct_map = {self._get_tag_item(item.tag, "json"): item for item in resp_struct}
 
             parsed_params = set()
@@ -183,9 +183,16 @@ class ConvertToSchema(object):
                                      type_info, item.desc))
 
                 if self.is_struct(type_info.type_kind):
-                    need_merge_structs_pair.append((
-                        type_info.go_type,
-                        self._parse_param_type(resp_struct_map[name], resp_struct_name).go_type))
+                    rsn = ""
+                    if name in resp_struct_map:
+                        rsp_type_info = self._parse_param_type(resp_struct_map[name], resp_struct_name)
+                        if not self.is_struct(rsp_type_info.type_kind):
+                            raise Exception("req struct:%s, opt:%s is struct, but the corresponding item of resp struct:%s is not" % (
+                                req_struct_name, name, resp_struct_name))
+
+                        rsn = rsp_type_info.go_type
+
+                    need_merge_structs_pair.append((type_info.go_type, rsn))
 
             for name in set(resp_struct_map.keys()) - parsed_params:
                 item = resp_struct_map[name]
