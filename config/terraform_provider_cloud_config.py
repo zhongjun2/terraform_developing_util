@@ -61,7 +61,8 @@ def get_cloud_code_dir(cloud_alias):
 def get_cloud_alias_by_dir(dir_name):
     for k, v in clouds.items():
         if dir_name.find(v.code_dir) == 0:
-            return k, 0
+            if dir_name == v.code_dir or dir_name[len(v.code_dir)] == "/":
+                return k, 0
     return "", 1
 
 
