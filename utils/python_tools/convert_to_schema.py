@@ -372,7 +372,7 @@ Elem: &schema.Resource{
             return """"%(schema_name)s": &schema.Schema{
 Type:     schema.TypeList,
 %(param_kind)s,
-MaxItems: ,
+MaxItems: 0,
 Elem: &schema.Schema{Type: schema.%(terraform_type)s},
 },
 """ %       {   "schema_name": opt.schema_name,
@@ -384,7 +384,7 @@ Elem: &schema.Schema{Type: schema.%(terraform_type)s},
             s = """"%(schema_name)s": &schema.Schema{
 Type:     schema.TypeList,
 %(param_kind)s,
-MaxItems: ,
+MaxItems: 0,
 Elem: &schema.Resource{
 """ %       {   "schema_name": opt.schema_name,
                 "param_kind": param_kind,
