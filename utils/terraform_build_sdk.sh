@@ -96,9 +96,11 @@ test $? -ne 0 && echo "generate requests.go of Create failed: $err" && exit 1
 test ${#err} -gt 0 && echo $err
 
 # generate Update part of requests.go
-err=$(python $req_resp_generator "req_update" $req_go_file $api_doc_dir/update.docx $resource_name "$update_success_codes" $update_req_method)
-test $? -ne 0 && echo "generate requests.go of Update failed: $err" && exit 1
-test ${#err} -gt 0 && echo $err
+if [ -f $api_doc_dir/update.docx ]; then
+    err=$(python $req_resp_generator "req_update" $req_go_file $api_doc_dir/update.docx $resource_name "$update_success_codes" $update_req_method)
+    test $? -ne 0 && echo "generate requests.go of Update failed: $err" && exit 1
+    test ${#err} -gt 0 && echo $err
+fi
 
 # generate Get/Delete part of requests.go
 delete_req_opt="nil"
