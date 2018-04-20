@@ -13,22 +13,24 @@ test $? -ne 0 && echo "can not find cloud name: $dest_cloud_alias" && exit 1
 
 acctest_env_dir=""
 if [ "$name" = "huaweicloud" ]; then
-    acctest_env_dir=/mnt/d/work_space_go/bin/huawei/acc_test_env
+    acctest_env_dir=huawei
 
 elif [ "$name" = "telefonicaopencloud" ]; then
-    acctest_env_dir=/mnt/d/work_space_go/bin/telef/acc_test_env
+    acctest_env_dir=telef
 
 elif [ "$name" = "opentelekomcloud" ]; then
-    acctest_env_dir=/mnt/d/work_space_go/bin/otc/acc_test_env
+    acctest_env_dir=otc
 
 elif [ "$name" = "flexibleengine" ]; then
-    acctest_env_dir=/mnt/d/work_space_go/bin/orange/acc_test_env
+    acctest_env_dir=orange
 
 else
     echo "not supported cloud: $name"
     exit 1
 fi
 
+test -z "$TERRAFORM_BIN" && echo "config env of 'TERRAFORM_BIN' first" && exit 0
+
 echo ""
-cat $acctest_env_dir/acc_test_env
+cat $TERRAFORM_BIN/$acctest_env_dir/acc_test_env/acc_test_env
 echo ""
