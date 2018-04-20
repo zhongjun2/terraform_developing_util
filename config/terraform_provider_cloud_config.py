@@ -8,18 +8,26 @@ def _normalize_dir(p):
     return "%s/src/%s" % (os.environ.get("GOPATH"), p)
 
 
+golangsdk="github.com/huaweicloud/golangsdk"
+gophercloud="github.com/gophercloud/gophercloud"
+
 sdks = {
-    "golangsdk": _normalize_dir("github.com/huaweicloud/golangsdk"),
+    "golangsdk": _normalize_dir(golangsdk),
 }
 
 
-Cloud = namedtuple("Cloud", "name, name_upper, name_long, sdk_name, code_dir")
+Cloud = namedtuple("Cloud", "name, name_upper, name_long, using_sdk, code_dir")
 
 # key is the alias of cloud
 clouds = {
-    "telefonicaopencloud": Cloud("telefonicaopencloud", "TelefonicaOpenCloud", "telefonica open cloud", "",           _normalize_dir("github.com/huaweicloud/terraform-provider-telefonicaopencloud")),
-    "huaweicloud":         Cloud("huaweicloud",         "HuaweiCloud",         "huawei cloud",          "golangsdk",  _normalize_dir("github.com/huaweicloud/terraform-provider-huaweicloud")),
+    "telefonicaopencloud": Cloud("telefonicaopencloud", "TelefonicaOpenCloud", "telefonica open cloud", golangsdk,    _normalize_dir("github.com/huaweicloud/terraform-provider-telefonicaopencloud")),
+    "oldtelef":            Cloud("telefonicaopencloud", "TelefonicaOpenCloud", "telefonica open cloud", gophercloud,  _normalize_dir("github.com/huawei-clouds/terraform-provider-telefonicaopencloud")),
+    "huaweicloud":         Cloud("huaweicloud",         "HuaweiCloud",         "huawei cloud",          golangsdk,    _normalize_dir("github.com/huaweicloud/terraform-provider-huaweicloud")),
     "opentelekomcloud":    Cloud("opentelekomcloud" ,   "OpenTelekomCloud",    "open telekom cloud",    "",           _normalize_dir("github.com/terraform-providers/terraform-provider-opentelekomcloud")),
+    "k-flexibleengine":    Cloud("flexibleengine",      "FlexibleEngine",      "flexible engine",       "",           _normalize_dir("github.com/Karajan-project/terraform-provider-flexibleengine")),
+    "gator":               Cloud("opentelekomcloud" ,   "OpenTelekomCloud",    "open telekom cloud",    "",           _normalize_dir("github.com/gator1111111/terraform-provider-opentelekomcloud")),
+    "hwotc":               Cloud("opentelekomcloud" ,   "OpenTelekomCloud",    "open telekom cloud",    "",           _normalize_dir("github.com/huaweicloud/terraform-provider-opentelekomcloud")),
+    "otc_back":            Cloud("opentelekomcloud" ,   "OpenTelekomCloud",    "open telekom cloud",    "",           _normalize_dir("github.com/terraform-providers/terraform-provider-opentelekomcloud.run_test")),
     "flexibleengine":      Cloud("flexibleengine",      "FlexibleEngine",      "flexible engine",       "",           _normalize_dir("github.com/huaweicloud/terraform-provider-flexibleengine")),
 }
 
@@ -57,6 +65,16 @@ def get_cloud_code_dir(cloud_alias):
     c = _get_cloud(cloud_alias)
     return (c.code_dir, 0) if c else ("", 1)
 
+def get_cloud_using_sdk(cloud_alias):
+    c = _get_cloud(cloud_alias)
+    return ("%s/vendor/%s" % (c.code_dir, c.using_sdk), 0) if c else ("", 1)
+
+def get_cloud_golangsdk_dir(cloud_alias):
+    c = _get_cloud(cloud_alias)
+    if c:
+        return "%s/vendor/github.com/huaweicloud/golangsdk" % c.code_dir, 0
+    return "", 1
+
 
 def get_cloud_alias_by_dir(dir_name):
     for k, v in clouds.items():
@@ -89,6 +107,8 @@ if __name__ == "__main__":
         "code_dir": get_cloud_code_dir,
         "guess_cloud_alias": get_cloud_alias_by_dir,
         "where_am_i": where_am_i,
+        "cloud_golangsdk_dir": get_cloud_golangsdk_dir,
+        "using_sdk": get_cloud_using_sdk,
     }
     f = methods.get(sys.argv[1])
     if not f:
