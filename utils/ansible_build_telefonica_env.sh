@@ -61,7 +61,7 @@ else
 fi
 
 module_list_file='/tmp/modules.list'
-curl https://github.com/zengchen1024/terraform_developing_util/blob/master/utils/ansible/telefonica_modules --create-dirs -o $module_list_file
+curl https://raw.githubusercontent.com/zengchen1024/terraform_developing_util/master/config/telefonica_modules.txt --create-dirs -o $module_list_file
 if [ $? -ne 0 ]; then
     echo "Dowload module list file failed"
     exit 1
