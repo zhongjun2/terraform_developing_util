@@ -60,16 +60,20 @@ else
     fi
 fi
 
-fs=(
-"https://github.com/zengchen1024/ansible/blob/new_smn_topic/lib/ansible/module_utils/hwc_utils.py"
-"https://github.com/zengchen1024/ansible/blob/new_smn_topic/lib/ansible/modules/cloud/telefonica/tfc_app_smn_topic.py"
-)
-for f in ${fs[*]}
+module_list_file='/tmp/modules.list'
+curl https://github.com/zengchen1024/terraform_developing_util/blob/master/utils/ansible/telefonica_modules --create-dirs -o $module_list_file
+if [ $? -ne 0 ]; then
+    echo "Dowload module list file failed"
+    exit 1
+fi
+while read f
 do
+    test -z "$f" && continue
+
     o=$(echo $f | awk -F '/lib/' '{print $NF}')
     curl $f --create-dirs -o lib/$o
     if [ $? -ne 0 ]; then
         echo "Download $f failed"
         exit 1
     fi
-done
+done < $module_list_file
