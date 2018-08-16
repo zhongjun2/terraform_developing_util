@@ -1,0 +1,2 @@
+https://raw.githubusercontent.com/zengchen1024/ansible/new_smn_topic/lib/ansible/module_utils/hwc_utils.py
+https://raw.githubusercontent.com/zengchen1024/ansible/new_smn_topic/lib/ansible/modules/cloud/telefonica/tfc_app_smn_topic.py
