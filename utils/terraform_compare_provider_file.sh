@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -lt 2 ]; then
-	echo "usage: $0 file dest_cloud_name [dest file]" $#
+	echo "usage: $0 file dest_cloud_name [dest file]"
 	exit 1
 fi
 
