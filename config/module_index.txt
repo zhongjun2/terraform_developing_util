@@ -1,0 +1,2 @@
+telefonica : ansible_telefonica_modules.txt
+otc : ansible_opentelekom_modules.txt
