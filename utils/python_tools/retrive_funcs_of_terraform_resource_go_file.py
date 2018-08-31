@@ -43,8 +43,8 @@ def retrive_invoked_func(target):
                 _retrive_single_file(f, indent + 4)
 
     file_name = target[target.rfind('/') + 1:]
-    print("\n%s" % file_name)
-    _retrive_single_file(file_name, 4)
+    print("\n    %s" % file_name)
+    _retrive_single_file(file_name, 8)
 
 
 if __name__ == "__main__":

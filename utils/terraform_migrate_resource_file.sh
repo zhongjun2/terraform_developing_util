@@ -9,8 +9,8 @@ if [ $# -lt 4 ]; then
     echo "       service_name: its value will be used as the index of the resource doc, for virtual machine its value can be 'Compute'"
     echo "       resource_file"
     echo "       resouece_doc_file"
-    echo "       [data_resource_file]"
-    echo "       [data_resouece_doc_file]"
+    echo "       [data_resource_file data_resouece_doc_file or other files]"
+    echo "            note: if there are multiple files, input them in the format of 'file1 file2 file3'"
     exit 1
 fi
 
@@ -29,35 +29,51 @@ test $? -ne 0 && echo "can not find cloud name: $dest_cloud_alias" && exit 1
 dest_cloud_u=$($get_config name_of_upper $dest_cloud_alias)
 dest_dir=$($get_config code_dir $dest_cloud_alias)
 
+p5=""
+if [ -n "$5" ]; then
+    files=($5)
+    for f in ${files[@]}
+    do
+        p5="$p5 $(ls $f)"
+    done
+fi
+
+# -----------------------------------------------
+
 echo -e "\nstep0: clear last update"
 
 cd $dest_dir
 git reset --hard
 
-files=$(git status | sed -n '/to include in what will be committed/,/nothing added to commit but untracked files present/p' | sed '1d;$d')
+files=($(git status | sed -n '/to include in what will be committed/,/nothing added to commit but untracked files present/p' | sed '1d;$d'))
 for d in ${files[@]}
 do
     test -f $d || test -d $d && rm -fr $d
 done
 cd $cur_dir
 
+# -----------------------------------------------
+
 echo -e "\nstep1: sync sdk"
 
 resource_file=$3
 resource_test_file="${resource_file%.go}_test.go"
-sdks=$(grep "huaweicloud/golangsdk/openstack" $resource_file $resource_test_file | awk -F '"' '{print $2}' | sort | uniq)
+sdks=$(grep "huaweicloud/golangsdk/openstack" $resource_file $resource_test_file $p5 | awk -F '"' '{print $2}' | sort | uniq)
 sdks="$sdks github.com/huaweicloud/golangsdk/openstack github.com/huaweicloud/golangsdk"
 cd $dest_dir
 for d in ${sdks[@]}
 do
     govendor fetch $d
-    test $? -ne 0 && echo "update $d failed"
+    test $? -ne 0 && echo "update lib of $d failed"
 done
 cd $cur_dir
 
+# -----------------------------------------------
+
 echo -e "\nstep2: sync data/resource files and doc"
 
-files=($resource_file $resource_test_file $4 $5 $6)
+
+files=($resource_file $resource_test_file $4 $p5)
 for f in ${files[@]}
 do
     test -f $f || continue
@@ -76,35 +92,54 @@ do
     sed -i "s/$($get_config name_of_long $src_cloud_alias)/$($get_config name_of_long $dest_cloud_alias)/g" $d_f
 done
 
+# -----------------------------------------------
+
 echo -e "\nstep3: add index of doc"
 
+files=("$4 $p5")
 cd $dest_dir
-doc_r=$(find -name $(basename $4))
-test -n "$6" && doc_d=$(find -name $(basename $6))
-terraform_add_index_of_doc.sh $doc_r:$doc_d "$2"
+docs=""
+for f in ${files[@]}
+do
+    if [[ $f =~ 'html.markdown ' ]]; then
+        docs="$docs:$(find -name $(basename $f))"
+    fi
+done
+terraform_add_index_of_doc.sh "$docs" "$2"
 cd $cur_dir
+
+# -----------------------------------------------
 
 echo -e "\nstep4: register resource to provider"
 
-rn=${resource_file%.go}
-rn=${rn##*_}
 sp=$(dirname $cur_dir/$resource_file)
 dp="${sp//$src_cloud/$dest_cloud}/provider.go"
 sp="$sp/provider.go"
-flags=("ResourcesMap" "DataSourcesMap")
+files=("$3 $p5")
+flags=("ResourcesMap:resource_" "DataSourcesMap:data_source_")
 for f in ${flags[@]}
 do
-    rg=$(sed -n '/'$f'/, /}/p' $sp | grep $rn)
-    if [ -n "$rg" ]; then
-        rg=${rg//$src_cloud/$dest_cloud}
-	if [[ ! $rg =~ ',' ]]; then
-            rg="$rg,"
-	fi
-        ln=$(sed -n '/'$f'/, /}/=' $dp | tail -n 1)
-        sed -i $ln'i\'"$rg" $dp
-    fi
+    prefix=${f##*:}
+    f=${f%:*}
+    for f1 in ${files[@]}
+    do
+        rn=${f1##${prefix}}
+        rn=${rn%.go}
+	continue
+        rg=$(sed -n '/'$f'/, /}/p' $sp | grep $rn)
+        if [ -n "$rg" ]; then
+            rg=${rg//$src_cloud/$dest_cloud}
+            if [[ ! $rg =~ ',' ]]; then
+                rg="$rg,"
+            fi
+            ln=$(sed -n '/'$f'/, /}/=' $dp | tail -n 1)
+            sed -i $ln'i\'"$rg" $dp
+        fi
+    done
 done
 gofmt -w $dp
+
+# -----------------------------------------------
 
 echo -e "\nstep5: compare the following files manually"
 
