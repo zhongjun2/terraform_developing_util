@@ -59,7 +59,7 @@ echo -e "\nstep1: sync sdk"
 resource_file=$3
 resource_test_file="${resource_file%.go}_test.go"
 sdks=$(grep "huaweicloud/golangsdk/openstack" $resource_file $resource_test_file $p5 | awk -F '"' '{print $2}' | sort | uniq)
-sdks="$sdks github.com/huaweicloud/golangsdk/openstack github.com/huaweicloud/golangsdk"
+sdks=("$sdks github.com/huaweicloud/golangsdk/openstack github.com/huaweicloud/golangsdk")
 cd $dest_dir
 for d in ${sdks[@]}
 do
@@ -71,7 +71,6 @@ cd $cur_dir
 # -----------------------------------------------
 
 echo -e "\nstep2: sync data/resource files and doc"
-
 
 files=($resource_file $resource_test_file $4 $p5)
 for f in ${files[@]}
