@@ -1,3 +1,5 @@
 https://raw.githubusercontent.com/zengchen1024/ansible/otc/lib/ansible/module_utils/hwc_utils.py
 https://raw.githubusercontent.com/zengchen1024/ansible/otc/lib/ansible/modules/cloud/opentelekom/otc_network_subnet.py
 https://raw.githubusercontent.com/zengchen1024/ansible/otc/lib/ansible/modules/cloud/opentelekom/otc_network_vpc.py
+https://raw.githubusercontent.com/zengchen1024/ansible/otc/lib/ansible/modules/cloud/opentelekom/otc_compute_instance.py
+https://raw.githubusercontent.com/zengchen1024/ansible/otc/lib/ansible/modules/cloud/opentelekom/otc_storage_block_volume.py
