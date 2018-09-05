@@ -24,11 +24,21 @@ has_prefix() {
     test -n "$r" && echo "yes" || echo "no"
 }
 
+has_postfix() {
+    local r=$(echo $1 | egrep "$2$")
+    test -n "$r" && echo "yes" || echo "no"
+}
+
 get_file_absolute_path() {
     local cur_dir=$(pwd)
     cd $(dirname $1)
     echo "$(pwd)/$(basename $1)"
     cd $cur_dir
+}
+
+get_file_relative_path() {
+    fp=$(get_file_absolute_path $1)
+    echo ${fp#$2}
 }
 
 fmt_go_file() {
