@@ -32,8 +32,9 @@ test $? -ne 0 && echo "can not find cloud name: $dest_cloud_alias" && exit 1
 dest_cloud_u=$($get_config name_of_upper $dest_cloud_alias)
 dest_dir=$($get_config code_dir $dest_cloud_alias)
 
-resource_file=$(get_file_absolute_path $3)
-resouece_doc_file=$(get_file_absolute_path $4)
+go_file=$(get_file_absolute_path $3)
+go_test_file="${go_file%.go}_test.go"
+doc_file=$(get_file_absolute_path $4)
 
 p5=""
 if [ -n "$5" ]; then
@@ -44,18 +45,15 @@ if [ -n "$5" ]; then
     done
 fi
 files=($p5)
-p5_go=""
-p5_doc=""
-p5_go_test=""
 for f in ${files[@]}
 do
     f=$(get_file_absolute_path $f)
     if [ "$(has_postfix $f 'html.markdown')" = "yes" ]; then
-        p5_doc="$p5_doc $f"
+        doc_file="$doc_file $f"
     elif [ "$(has_postfix $f '_test.go')" = "yes" ]; then
-        p5_go_test="$p5_go_test $f"
+        go_test_file="$go_test_file $f"
     elif [ "$(has_postfix $f '.go')" = "yes" ]; then
-        p5_go="$p5_go $f"
+        go_file="$go_file $f"
     else
         echo "unknown file: $f" && exit 1
     fi
@@ -79,8 +77,7 @@ cd $cur_dir
 
 echo -e "\nstep1: sync sdk"
 
-resource_test_file="${resource_file%.go}_test.go"
-sdks=$(grep "huaweicloud/golangsdk/openstack" $resource_file $resource_test_file $p5_go $p5_go_test | awk -F '"' '{print $2}' | sort | uniq)
+sdks=$(grep "huaweicloud/golangsdk/openstack" $go_file $go_test_file | awk -F '"' '{print $2}' | sort | uniq)
 sdks=("github.com/huaweicloud/golangsdk/openstack github.com/huaweicloud/golangsdk $sdks")
 cd $dest_dir
 for d in ${sdks[@]}
@@ -103,7 +100,7 @@ replace_cloud() {
     sed -i "${p}s/$($get_config name_of_long $src_cloud_alias)/$($get_config name_of_long $dest_cloud_alias)/g" $1
 }
 
-files=($resource_file $resource_test_file $resouece_doc_file $p5_go $p5_go_test $p5_doc)
+files=($go_file $go_test_file $doc_file)
 for f in ${files[@]}
 do
     test -f $f || continue
@@ -141,7 +138,7 @@ done
 
 echo -e "\nstep3: add index of doc"
 
-files=("$resouece_doc_file $p5_doc")
+files=($doc_file)
 cd $dest_dir
 docs=""
 for f in ${files[@]}
@@ -158,7 +155,7 @@ echo -e "\nstep4: register resource to provider"
 
 dp="$dest_dir/$dest_cloud/provider.go"
 sp="$src_dir/$src_cloud/provider.go"
-files=("$resource_file $p5_go")
+files=($go_file)
 flags=("ResourcesMap:resource_" "DataSourcesMap:data_source_")
 for f in ${flags[@]}
 do
@@ -169,7 +166,7 @@ do
         f1=$(basename $f1)
         rn=${f1##${prefix}}
         rn=${rn%.go}
-        if [ -n "$(sed -n '/'$f'/, /}/p' $dp | grep ${rn//$src_cloud/$dest_cloud})"]; then
+        if [ -n "$(sed -n '/'$f'/, /}/p' $dp | grep ${rn//$src_cloud/$dest_cloud})" ]; then
             continue
         fi
 
@@ -190,7 +187,7 @@ gofmt -w $dp
 
 echo -e "\nstep5: compare the following files manually"
 
-files=($resource_file $p5_go)
+files=($go_file)
 for f in ${files[@]}
 do
     python $(dirname $(which $0))/python_tools/retrive_funcs_of_terraform_resource_go_file.py $f
