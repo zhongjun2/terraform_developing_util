@@ -158,7 +158,7 @@ func Update(c *golangsdk.ServiceClient, id string, opts UpdateOptsBuilder) (r Up
 \t\treturn
 \t}
 \tlog.Printf("[DEBUG] update url:%%q, body=%%#v", updateURL(c, id), b)
-\treqOpt := %(req_opt)s 
+\treqOpt := %(req_opt)s
 \t_, r.Err = c.%(method)s(updateURL(c, id), b, &r.Body, reqOpt)
 \treturn
 }
