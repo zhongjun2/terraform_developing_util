@@ -21,8 +21,6 @@ code_dir=$1
 mkdir -p $code_dir
 test $? -ne 0 && echo "make dir failed for: $code_dir" && exit 1
 
-sdk_name="golangsdk"
-
 package_name=$2
 resource_name=$(capitalize $2)
 api_doc_dir=$3
@@ -211,6 +209,12 @@ default_result() {
         sn=$(capitalize $sn)
     fi
 
+    echo -e "
+
+type ${op}Result struct {
+\tgolangsdk.Result
+}" >> $resp_go_file
+
     if [ -z "$msg_prefix" ]; then
         echo -e "
 
@@ -222,14 +226,8 @@ func (r ${op}Result) Extract() (*${sn}, error) {
         echo -e "
 
 func (r ${op}Result) Extract() (*${sn}, error) {
-    var o struct {
-         Obj $sn \`json:\"${msg_prefix}\"\`
-    }
-    err := r.ExtractInto(&o)
-    if err != nil {
-        return nil, err
-    }
-    return &(o.Obj), nil
+    o := &${sn}{}
+    return o, r.ExtractIntoStructPtr(o, \"${msg_prefix}\")
 }" >> $resp_go_file
     fi
 
@@ -242,7 +240,7 @@ func (r ${op}Result) Extract() (*${sn}, error) {
 echo "package $package_name" > $resp_go_file
 
 # generate CRUD method
-fs=("get.docx:get_rsp" "create_resp.docx:create_rsp" "update_resp.docx:update_rsp")
+fs=("get.docx:get_rsp" "create_rsp.docx:create_rsp" "update_rsp.docx:update_rsp")
 for item in ${fs[@]}
 do
     f=$api_doc_dir/${item%:*}
